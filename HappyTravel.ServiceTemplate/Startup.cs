@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace HappyTravel.ServiceTemplate
 {
@@ -11,6 +13,13 @@ namespace HappyTravel.ServiceTemplate
     {
         public void ConfigureServices(IServiceCollection services)
         {
+            var serializationSettings = new JsonSerializerSettings
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                Formatting = Formatting.None
+            };
+            JsonConvert.DefaultSettings = () => serializationSettings;
+            
             services.AddHttpClient();
             services.AddHealthChecks();
 
