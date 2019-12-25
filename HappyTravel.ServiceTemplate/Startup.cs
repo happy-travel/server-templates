@@ -1,9 +1,11 @@
 ﻿using System;
 using HappyTravel.ServiceTemplate.Services;
+using HappyTravel.VaultClient;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -11,7 +13,13 @@ namespace HappyTravel.ServiceTemplate
 {
     public class Startup
     {
-        public void ConfigureServices(IServiceCollection services)
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+
+        public void ConfigureServices(IServiceCollection services, ILoggerFactory loggerFactory)
         {
             var serializationSettings = new JsonSerializerSettings
             {
@@ -19,7 +27,14 @@ namespace HappyTravel.ServiceTemplate
                 Formatting = Formatting.None
             };
             JsonConvert.DefaultSettings = () => serializationSettings;
-            
+
+            using var vault = new VaultClient.VaultClient(new VaultOptions
+            {
+                BaseUrl = new Uri(Configuration["Vault:Endpoint"]),
+                Engine = Configuration["Vault:Engine"],
+                Role = Configuration["Vault:Role"]
+            }, loggerFactory);
+
             services.AddHttpClient();
             services.AddHealthChecks();
 
@@ -27,19 +42,12 @@ namespace HappyTravel.ServiceTemplate
         }
 
         
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseHealthChecks("/health");
         }
 
 
-        private static string GetFromEnvironment(IConfiguration configuration, string key)
-        {
-            var environmentVariable = configuration[key];
-            if (environmentVariable is null)
-                throw new Exception($"Couldn't obtain the value for '{key}' configuration key.");
-
-            return Environment.GetEnvironmentVariable(environmentVariable);
-        }
+        private IConfiguration Configuration { get; }
     }
 }
