@@ -6,9 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HappyTravel.SentryLogger" Version="1.0.2" />
-    <PackageReference Include="HappyTravel.VaultClient" Version="1.0.3" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="HappyTravel.StdOutLogger" Version="1.0.12" />
+    <PackageReference Include="HappyTravel.VaultClient" Version="1.0.5" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Sentry.AspNetCore" Version="2.1.1" />
   </ItemGroup>
 
 </Project>
