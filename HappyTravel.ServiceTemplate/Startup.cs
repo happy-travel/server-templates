@@ -1,4 +1,5 @@
 ﻿using System;
+using HappyTravel.ServiceTemplate.Infrastructure;
 using HappyTravel.ServiceTemplate.Services;
 using HappyTravel.VaultClient;
 using Microsoft.AspNetCore.Builder;
@@ -28,12 +29,7 @@ namespace HappyTravel.ServiceTemplate
             };
             JsonConvert.DefaultSettings = () => serializationSettings;
 
-            using var vault = new VaultClient.VaultClient(new VaultOptions
-            {
-                BaseUrl = new Uri(Configuration["Vault:Endpoint"]),
-                Engine = Configuration["Vault:Engine"],
-                Role = Configuration["Vault:Role"]
-            }, loggerFactory);
+            using var vault = VaultHelper.CreateVaultClient(Configuration , loggerFactory);
 
             services.AddHttpClient();
             services.AddHealthChecks();
