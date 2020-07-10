@@ -46,18 +46,18 @@ namespace HappyTravel.ApiTemplate.Infrastructure
             }
             
             var serviceName = $"{environment.ApplicationName}-{environment.EnvironmentName}";
-            services.AddOpenTelemetry(builder =>
+            services.AddOpenTelemetrySdk(builder =>
             {
-                builder.UseJaeger(options =>
+                builder.AddRequestInstrumentation()
+                    .AddDependencyInstrumentation()
+                    .UseJaegerActivityExporter(options =>
                     {
                         options.ServiceName = serviceName;
                         options.AgentHost = agentHost;
                         options.AgentPort = agentPort;
                     })
-                    .AddRequestCollector()
-                    .AddDependencyCollector()
                     .SetResource(Resources.CreateServiceResource(serviceName))
-                    .SetSampler(new AlwaysOnSampler());
+                    .SetSampler(new AlwaysOnActivitySampler());
             });
 
             return services;
